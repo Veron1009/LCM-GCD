@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCM and GCD Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 95%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="number"], input[type="submit"], button {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        input[type="number"] {
+            width: 95%;
+        }
+        input[type="submit"], button {
+            background-color: #0019fe;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #212688;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .results span {
+            font-weight: bold;
+        }
+        .explanation {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            background-color: #e3e3e3;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>LCM and GCD Calculator</h1>
+
+    <!-- Step 1: Get number of inputs -->
+    <form id="step1Form">
+        <label for="numCount">Enter the number of integers:</label>
+        <input type="number" id="numCount" min="2" placeholder="Enter at least 2 integers" required>
+        <input type="submit" value="Next">
+    </form>
+
+    <!-- Step 2: Input numbers (appears after step 1) -->
+    <form id="step2Form" style="display:none;">
+        <div id="inputsContainer"></div>
+        <button type="button" id="calculateBtn">Calculate</button>
+    </form>
+
+    <!-- Results for LCM and GCD (appears after calculation) -->
+    <div class="results" id="results" style="display:none;">
+        <p><span>LCM:</span> <span id="lcmResult"></span></p>
+        <p><span>GCD:</span> <span id="gcdResult"></span></p>
+
+        <!-- Explanation of the GCD and LCM calculation -->
+        <div class="explanation" id="explanation" style="display:none;">
+            <h3>Solution:</h3>
+            <p id="solutionExplanation"></p>
+            <p><strong>GCD Calculation:</strong></p>
+            <p id="gcdExplanation"></p>
+
+            <p><strong>LCM Calculation:</strong></p>
+            <p id="lcmExplanation"></p>
+        </div>
+    </div>
+    <iframe title="tutorial" src="https://www.youtube.com/embed/QUufg9kpEPE?controls=0&autoplay=1&mute=1&loop=1"></iframe>
+</div>
+
+<script>
+    const step1Form = document.getElementById('step1Form');
+    const step2Form = document.getElementById('step2Form');
+    const inputsContainer = document.getElementById('inputsContainer');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const lcmResult = document.getElementById('lcmResult');
+    const gcdResult = document.getElementById('gcdResult');
+    const explanationDiv = document.getElementById('explanation');
+    const solutionExplanation = document.getElementById('solutionExplanation');
+    const gcdExplanation = document.getElementById('gcdExplanation');
+    const lcmExplanation = document.getElementById('lcmExplanation');
+    const resultsDiv = document.getElementById('results');
+    var numCount;
+
+    // Handle step 1 form submission
+    step1Form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        numCount = document.getElementById('numCount').value;
+        inputsContainer.innerHTML = '';
+
+        // Create inputs dynamically based on numCount
+        for (let i = 1; i <= numCount; i++) {
+            let input = document.createElement('input');
+            input.type = 'number';
+            input.placeholder = `Enter number ${i}`;
+            input.required = true;
+            input.className = 'inputNumber';
+            inputsContainer.appendChild(input);
+        }
+
+        // Hide step 1 form and show step 2 form
+        step1Form.style.display = 'none';
+        step2Form.style.display = 'block';
+    });
+
+    // Calculate LCM and GCD when "Calculate" button is clicked
+    calculateBtn.addEventListener('click', function() {
+        let inputNumbers = Array.from(document.getElementsByClassName('inputNumber')).map(input => parseInt(input.value));
+
+        // GCD function using Euclid's algorithm
+        const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+
+        // LCM function
+        const lcm = (a, b) => Math.abs(a * b) / gcd(a, b);
+
+        // Calculate GCD of multiple numbers
+        let calculatedGCD = inputNumbers.reduce((acc, curr) => gcd(acc, curr));
+
+        // Calculate LCM of multiple numbers
+        let calculatedLCM = inputNumbers.reduce((acc, curr) => lcm(acc, curr));
+
+        // Show results
+        lcmResult.textContent = calculatedLCM;
+        gcdResult.textContent = calculatedGCD;
+        resultsDiv.style.display = 'block';
+
+        // Generate detailed explanation
+        generateExplanation(inputNumbers, calculatedLCM, calculatedGCD);
+    });
+
+    // Generate the explanation for GCD and LCM
+    function generateExplanation(numbers, lcm, gcd) {
+
+        solutionExplanation.innerHTML = `<ul></ul>`;
+        let ul = document.querySelector('ul');
+        for (let i = 0; i < numCount; i++) {
+            let primeFactorExplanationnumbers = document.createElement('li');
+            primeFactorExplanationnumbers.innerHTML = `<strong>Prime factorization of ${numbers[i]}: </strong> ${getPrimeFactors(numbers[i])}`;
+            ul.appendChild(primeFactorExplanationnumbers);
+        }
+        
+        // GCD Explanation
+        gcdExplanation.innerHTML = `
+            The greatest common divisor (GCD) is the product of the common prime factors. <br>
+            <strong>GCD = ${gcd}</strong>
+        `;
+
+        // LCM Explanation
+        lcmExplanation.innerHTML = `
+            The least common multiple (LCM) is the product of the highest powers of all prime factors. <br>
+            <strong>LCM = ${lcm}</strong>
+        `;
+
+        explanationDiv.style.display = 'block';
+    }
+
+    // Helper function to get prime factors of a number
+    function getPrimeFactors(number) {
+        const factors = [];
+        let divisor = 2;
+        while (number >= 2) {
+            if (number % divisor === 0) {
+                factors.push(divisor);
+                number = number / divisor;
+            } else {
+                divisor++;
+            }
+        }
+        return factors.join(' × ');
+    }
+</script>
+
+</body>
+</html>
